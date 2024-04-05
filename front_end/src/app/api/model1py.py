@@ -1,3 +1,5 @@
+# front_end\src\app\api\model1.py
+
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -5,11 +7,16 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 import joblib
 
-prediction_file = 'BSWevent_test-1.csv'
-
-def make_prediction(model, scaler, file_path):
+def make_prediction(file_path):
+    # Load model and scaler
+    model = joblib.load('bsw_model.pkl')
+    scaler = joblib.load('bsw_scaler.pkl')
+    
+    # Read input data
     test_data = pd.read_csv(file_path, delimiter='\t')
     test_data = test_data[['P-TPT', 'T-TPT', 'P-MON-CKP']].dropna()
+    
+    # Transform data and make predictions
     X_test = scaler.transform(test_data)
     predictions_proba = model.predict_proba(X_test)
     chance_of_BSW = predictions_proba[:, 1].mean() * 100
@@ -20,10 +27,3 @@ def make_prediction(model, scaler, file_path):
         output_file.write(prediction_text)
     
     return prediction_text
-
-model = joblib.load('bsw_model.pkl')
-scaler = joblib.load('bsw_scaler.pkl')
-prediction = make_prediction(model, scaler, prediction_file)
-
-# The prediction is both returned by the function and written to 'prediction_output.txt'
-print(prediction)
