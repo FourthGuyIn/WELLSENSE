@@ -1,7 +1,7 @@
 // front_end\src\app\model1\page.tsx
 
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { CSSProperties } from 'react';
 
@@ -17,7 +17,7 @@ const Model1: React.FC = () => {
     const fetchData = async () => {
         try {
             const response = await fetch('/api/route', {
-                method: 'POST', 
+                method: 'POST',
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -32,15 +32,20 @@ const Model1: React.FC = () => {
     };
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files[0];
+        const file = event.target.files ? event.target.files[0] : null;
         setSelectedFile(file);
     };
 
     const handleRunButtonClick = async () => {
+        if (!selectedFile) {
+            setError('Please select a file');
+            return;
+        }
+
         try {
             const formData = new FormData();
             formData.append('file', selectedFile);
-            const response = await fetch('/api/model1', {
+            const response = await fetch('/api/route', { // Change the URL back to /api/route
                 method: 'POST',
                 body: formData,
             });
